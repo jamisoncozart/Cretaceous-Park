@@ -19,9 +19,26 @@ namespace CretaceousPark.Controllers
 
     // GET api/animals
     [HttpGet]
-    public ActionResult<IEnumerable<Animal>> Get()
+    public ActionResult<IEnumerable<Animal>> Get(string species, string gender, string name)
     {
-      return _db.Animals.ToList();
+      var query = _db.Animals.AsQueryable();
+
+      if (species != null)
+      {
+      query = query.Where(entry => entry.Species == species);
+      }
+
+      if (gender != null)
+      {
+      query = query.Where(entry => entry.Gender == gender);
+      }
+
+      if (name != null)
+      {
+      query = query.Where(entry => entry.Name == name);
+      }
+
+      return query.ToList();
     }
 
     // POST api/animals
@@ -47,5 +64,16 @@ namespace CretaceousPark.Controllers
         _db.Entry(animal).State = EntityState.Modified;
         _db.SaveChanges();
     }
+
+    // DELETE api/animals/5
+    [HttpDelete("{id}")]
+    public void Delete(int id)
+    {
+      var animalToDelete = _db.Animals.FirstOrDefault(entry => entry.AnimalId == id);
+      _db.Animals.Remove(animalToDelete);
+      _db.SaveChanges();
+    }
+
+    
   }
 }
